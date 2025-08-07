@@ -1,4 +1,4 @@
-package com.example.AIProject.Controllers;
+package com.example.AIProject.controllers;
 
 import com.example.AIProject.entities.EmployeeProfile;
 import com.example.AIProject.requests.employeeProfile.CreateEmployeeProfileRequest;

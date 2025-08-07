@@ -1,4 +1,4 @@
-package com.example.AIProject.Controllers;
+package com.example.AIProject.controllers;
 
 import com.example.AIProject.entities.Position;
 import com.example.AIProject.requests.position.CreatePositionRequest;

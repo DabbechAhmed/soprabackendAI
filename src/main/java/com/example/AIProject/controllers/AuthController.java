@@ -1,4 +1,4 @@
-package com.example.AIProject.Controllers;
+package com.example.AIProject.controllers;
 
 import com.example.AIProject.exceptions.AlreadyExistsException;
 import com.example.AIProject.requests.auth.LoginRequest;

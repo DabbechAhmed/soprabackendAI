@@ -22,6 +22,7 @@ public class ShopUserDetails implements UserDetails {
     private Long id;
     private String email;
     private String password;
+    private String fullName;
     private int tokenVersion;
 
 
@@ -36,6 +37,7 @@ public class ShopUserDetails implements UserDetails {
                 user.getId(),
                 user.getEmail(),// Allways use email as username and after the id
                 user.getPassword(),
+                user.getFullName(),
                 user.getTokenVersion(),
                 authorities
         );

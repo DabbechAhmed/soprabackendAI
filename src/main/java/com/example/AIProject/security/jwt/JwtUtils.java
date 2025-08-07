@@ -31,6 +31,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .setSubject(userPrincipal.getEmail())
                 .claim("roles", roles)
+                .claim("fullName", userPrincipal.getFullName())
                 .claim("id", userPrincipal.getId())
                 .claim("tokenVersion", userPrincipal.getTokenVersion())
                 .setIssuedAt(new Date())

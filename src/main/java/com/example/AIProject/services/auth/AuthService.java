@@ -1,5 +1,6 @@
 package com.example.AIProject.services.auth;
 
+import com.example.AIProject.dto.UserDto;
 import com.example.AIProject.entities.Role;
 import com.example.AIProject.entities.User;
 import com.example.AIProject.exceptions.AlreadyExistsException;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,15 +34,25 @@ public class AuthService implements IAuthService {
     private final PasswordEncoder passwordEncoder;
     @Override
     public JwtResponse login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+
         String jwt = jwtUtils.generateTokenForUser(authentication);
-        ShopUserDetails userDetails = (ShopUserDetails) authentication.getPrincipal();
-        return JwtResponse.builder()
-                .id(userDetails.getId())
-                .token(jwt)
+        User user = userRepository.findByEmail(loginRequest.getEmail());
+
+        UserDto userDto = UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .isActive(user.getIsActive())
                 .build();
 
+        return JwtResponse.builder()
+                .token(jwt)
+                .user(userDto)
+                .build();
     }
 
     @Override
@@ -69,10 +81,17 @@ public class AuthService implements IAuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtUtils.generateTokenForUser(authentication);
-        ShopUserDetails userDetails = (ShopUserDetails) authentication.getPrincipal();
+        UserDto userDto= UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .isActive(user.getIsActive())
+                .build();
+
 
         return JwtResponse.builder()
-                .id(userDetails.getId())
+                .user(userDto)
                 .token(jwt)
                 .build();
     }
