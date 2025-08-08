@@ -1,5 +1,6 @@
 package com.example.AIProject.services.employeeProfile;
 
+import com.example.AIProject.dto.EmployeeProfileDTO;
 import com.example.AIProject.entities.EmployeeProfile;
 import com.example.AIProject.entities.User;
 import com.example.AIProject.repository.EmployeeProfileRepository;
@@ -7,6 +8,7 @@ import com.example.AIProject.repository.UserRepository;
 import com.example.AIProject.requests.employeeProfile.CreateEmployeeProfileRequest;
 import com.example.AIProject.requests.employeeProfile.UpdateEmployeeProfileRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class EmployeeProfileService implements IEmployeeProfileService {
 
     private final EmployeeProfileRepository employeeProfileRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -152,5 +155,10 @@ public class EmployeeProfileService implements IEmployeeProfileService {
                            profile.getCity() != null && !profile.getCity().trim().isEmpty();
 
         profile.setProfileComplete(isComplete);
+    }
+
+    @Override
+    public EmployeeProfileDTO convertToDTO(EmployeeProfile profile) {
+        return modelMapper.map(profile, EmployeeProfileDTO.class);
     }
 }

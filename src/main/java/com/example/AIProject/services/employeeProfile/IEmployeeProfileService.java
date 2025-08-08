@@ -1,5 +1,6 @@
 package com.example.AIProject.services.employeeProfile;
 
+import com.example.AIProject.dto.EmployeeProfileDTO;
 import com.example.AIProject.entities.EmployeeProfile;
 import com.example.AIProject.requests.employeeProfile.CreateEmployeeProfileRequest;
 import com.example.AIProject.requests.employeeProfile.UpdateEmployeeProfileRequest;
@@ -17,4 +18,6 @@ public interface IEmployeeProfileService {
     List<EmployeeProfile> getProfilesByLocation(String country, String city);
     EmployeeProfile markProfileAsComplete(Long id);
     List<EmployeeProfile> getProfilesForAIRecommendation();
+
+    EmployeeProfileDTO convertToDTO(EmployeeProfile profile);
 }
