@@ -46,7 +46,7 @@ public class ImageController {
     }
 
     @GetMapping("/user/{userId}/image")
-    public ResponseEntity<?> downloadImageByUserId(@PathVariable Long userId) throws SQLException {
+    public ResponseEntity<?> downloadImageByUserId(@PathVariable Long userId) {
         try {
             Image image=imageService.getImageByUserId(userId);
             ByteArrayResource resource=new ByteArrayResource(image.getImage().getBytes(1, (int) image.getImage().length()));
