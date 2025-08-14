@@ -1,5 +1,6 @@
 package com.example.AIProject.services.application;
 
+import com.example.AIProject.dto.ApplicationDto;
 import com.example.AIProject.entities.Application;
 import com.example.AIProject.entities.Position;
 import com.example.AIProject.entities.User;
@@ -12,12 +13,14 @@ import com.example.AIProject.repository.UserRepository;
 import com.example.AIProject.requests.application.CreateApplicationRequest;
 import com.example.AIProject.requests.application.UpdateApplicationRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,43 +30,49 @@ public class ApplicationService implements IApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
     private final PositionRepository positionRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Application> getAllApplications() {
-        return applicationRepository.findAll();
+    public List<ApplicationDto> getAllApplications() {
+        return applicationRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Application> getApplicationById(Long id) {
-        return applicationRepository.findById(id);
+    public Optional<ApplicationDto> getApplicationById(Long id) {
+        return applicationRepository.findById(id)
+                .map(this::convertToDto);
     }
 
+   @Override
+   public ApplicationDto createApplication(CreateApplicationRequest request) {
+       if (hasUserAppliedToPosition(request.getUserId(), request.getPositionId())) {
+           throw new UnAuthorizedException("L'utilisateur a déjà postulé pour cette position");
+       }
+
+       User user = userRepository.findById(request.getUserId())
+               .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable avec l'ID: " + request.getUserId()));
+
+       Position position = positionRepository.findById(request.getPositionId())
+               .orElseThrow(() -> new ResourceNotFoundException("Position introuvable avec l'ID: " + request.getPositionId()));
+
+       Application application = new Application();
+       application.setUser(user);
+       application.setPosition(position);
+       application.setCoverLetter(request.getCoverLetter());
+       application.setStatus(ApplicationStatus.PENDING);
+       application.setAiMatchScore(request.getAiMatchScore()); // Utiliser le score de la requête
+
+       Application savedApplication = applicationRepository.save(application);
+       return convertToDto(savedApplication);
+   }
+
     @Override
-    public Application createApplication(CreateApplicationRequest request) {
-        // Vérifier si l'utilisateur a déjà postulé pour cette position
-        if (hasUserAppliedToPosition(request.getUserId(), request.getPositionId())) {
-            throw new UnAuthorizedException("L'utilisateur a déjà postulé pour cette position");
-        }
-
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable avec l'ID: " + request.getUserId()));
-
-        Position position = positionRepository.findById(request.getPositionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Position introuvable avec l'ID: " + request.getPositionId()));
-
-        Application application = new Application();
-        application.setUser(user);
-        application.setPosition(position);
-        application.setCoverLetter(request.getCoverLetter());
-        application.setStatus(ApplicationStatus.PENDING);
-
-        return applicationRepository.save(application);
-    }
-
-    @Override
-    public Application updateApplication(Long id, UpdateApplicationRequest request) {
+    public ApplicationDto updateApplication(Long id, UpdateApplicationRequest request) {
         return applicationRepository.findById(id)
                 .map(existingApplication -> {
                     if (request.getCoverLetter() != null) {
@@ -76,7 +85,8 @@ public class ApplicationService implements IApplicationService {
                         existingApplication.setAiMatchScore(request.getAiMatchScore());
                     }
 
-                    return applicationRepository.save(existingApplication);
+                    Application savedApplication = applicationRepository.save(existingApplication);
+                    return convertToDto(savedApplication);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'ID: " + id));
     }
@@ -91,40 +101,55 @@ public class ApplicationService implements IApplicationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Application> getApplicationsByUserId(Long userId) {
-        return applicationRepository.findByUserId(userId);
+    public List<ApplicationDto> getApplicationsByUserId(Long userId) {
+        return applicationRepository.findByUserId(userId)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Application> getApplicationsByPositionId(Long positionId) {
-        return applicationRepository.findByPositionId(positionId);
+    public List<ApplicationDto> getApplicationsByPositionId(Long positionId) {
+        return applicationRepository.findByPositionId(positionId)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Application> getApplicationsByStatus(ApplicationStatus status) {
-        return applicationRepository.findByStatus(status);
+    public List<ApplicationDto> getApplicationsByStatus(ApplicationStatus status) {
+        return applicationRepository.findByStatus(status)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Application updateApplicationStatus(Long id, ApplicationStatus status) {
+    public ApplicationDto updateApplicationStatus(Long id, ApplicationStatus status) {
         return applicationRepository.findById(id)
                 .map(application -> {
                     application.setStatus(status);
-                    return applicationRepository.save(application);
+                    Application savedApplication = applicationRepository.save(application);
+                    return convertToDto(savedApplication);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'ID: " + id));
     }
 
     @Override
-    public Application updateAiMatchScore(Long id, BigDecimal score) {
+    public ApplicationDto updateAiMatchScore(Long id, BigDecimal score) {
         return applicationRepository.findById(id)
                 .map(application -> {
                     application.setAiMatchScore(score);
-                    return applicationRepository.save(application);
+                    Application savedApplication = applicationRepository.save(application);
+                    return convertToDto(savedApplication);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'ID: " + id));
+    }
+
+    private ApplicationDto convertToDto(Application application) {
+        return modelMapper.map(application, ApplicationDto.class);
     }
 
     @Override

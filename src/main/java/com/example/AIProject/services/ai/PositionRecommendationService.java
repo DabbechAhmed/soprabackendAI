@@ -56,6 +56,51 @@ public class PositionRecommendationService {
                 .collect(Collectors.toList());
     }
 
+    public List<PositionRecommendationDto> getRecommendedPositionsByCountry(Long employeeId, String country) {
+        log.info("Recherche de recommandations pour l'employé {} dans le pays {}", employeeId, country);
+
+        EmployeeProfile profile = employeeProfileRepository.findByUserId(employeeId)
+                .orElseThrow(() -> new RuntimeException("Profil employé non trouvé"));
+
+        if (profile.getCvText() == null || profile.getCvText().trim().isEmpty()) {
+            throw new RuntimeException("Le CV de l'employé est requis pour les recommandations");
+        }
+
+        List<Position> countryPositions = positionRepository.findActivePositionsByCountry(country);
+
+        log.info("Analyse de {} positions dans {}", countryPositions.size(), country);
+
+        return countryPositions.stream()
+                .map(position -> calculatePositionMatch(profile, position))
+                .filter(recommendation -> recommendation.getMatchScore() >= minRecommendationScore)
+                .sorted((a, b) -> Double.compare(b.getMatchScore(), a.getMatchScore()))
+                .limit(maxResults)
+                .collect(Collectors.toList());
+    }
+
+    public List<PositionRecommendationDto> getRecommendedPositionsByCountryAndCity(
+            Long employeeId, String country, String city) {
+        log.info("Recherche de recommandations pour l'employé {} dans {} - {}", employeeId, country, city);
+
+        EmployeeProfile profile = employeeProfileRepository.findByUserId(employeeId)
+                .orElseThrow(() -> new RuntimeException("Profil employé non trouvé"));
+
+        if (profile.getCvText() == null || profile.getCvText().trim().isEmpty()) {
+            throw new RuntimeException("Le CV de l'employé est requis pour les recommandations");
+        }
+
+        List<Position> locationPositions = positionRepository.findActivePositionsByCountryAndCity(country, city);
+
+        log.info("Analyse de {} positions dans {} - {}", locationPositions.size(), country, city);
+
+        return locationPositions.stream()
+                .map(position -> calculatePositionMatch(profile, position))
+                .filter(recommendation -> recommendation.getMatchScore() >= minRecommendationScore)
+                .sorted((a, b) -> Double.compare(b.getMatchScore(), a.getMatchScore()))
+                .limit(maxResults)
+                .collect(Collectors.toList());
+    }
+
     public List<PositionRecommendationDto> getRecommendedPositionsByBranch(Long employeeId, Long branchId) {
         log.info("Recherche de recommandations pour l'employé {} dans la branche {}", employeeId, branchId);
 

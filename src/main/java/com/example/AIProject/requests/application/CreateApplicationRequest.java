@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Data
 public class CreateApplicationRequest {
     @NotNull(message = "L'ID de l'utilisateur est obligatoire")
@@ -14,4 +16,7 @@ public class CreateApplicationRequest {
     private Long positionId;
 
     private String coverLetter;
+
+    private BigDecimal aiMatchScore;
+
 }

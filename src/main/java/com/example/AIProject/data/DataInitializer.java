@@ -174,6 +174,131 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
 
             positionRepository.save(fullStackPosition);
         }
+        // Position 5: Backend Architect - Très compatible
+        if (!positionRepository.existsByTitle("Backend Architect")) {
+            Position backendArchitectPosition = new Position();
+            backendArchitectPosition.setTitle("Backend Architect");
+            backendArchitectPosition.setDepartment("Software Architecture");
+            backendArchitectPosition.setDescription("We are seeking a Backend Architect to design and implement " +
+                    "scalable microservices architecture. Lead technical decisions and mentor development teams.");
+            backendArchitectPosition.setRequirements("5+ years Java/Spring Boot, microservices architecture, " +
+                    "Docker, Kubernetes, AWS/Azure, PostgreSQL, system design experience required.");
+            backendArchitectPosition.setSalaryMin(new BigDecimal("5500"));
+            backendArchitectPosition.setSalaryMax(new BigDecimal("7500"));
+            backendArchitectPosition.setContractType(ContractType.CDI);
+            backendArchitectPosition.setExperienceRequired(6);
+            backendArchitectPosition.setEducationRequired(EducationLevel.MASTERS);
+            backendArchitectPosition.setStatus(PositionStatus.ACTIVE);
+            backendArchitectPosition.setMobilityType(MobilityType.EXTERNAL);
+            backendArchitectPosition.setTargetBranch(franceBranch);
+
+            positionRepository.save(backendArchitectPosition);
+        }
+
+        // Position 6: DevOps Engineer - Compatible
+        if (!positionRepository.existsByTitle("DevOps Engineer")) {
+            Position devopsPosition = new Position();
+            devopsPosition.setTitle("DevOps Engineer");
+            devopsPosition.setDepartment("Infrastructure");
+            devopsPosition.setDescription("DevOps Engineer to manage CI/CD pipelines, containerization, " +
+                    "and cloud infrastructure. Work with development teams to automate deployment processes.");
+            devopsPosition.setRequirements("Docker, Kubernetes, Jenkins, AWS, Git, Linux administration. " +
+                    "Experience with Java applications deployment preferred.");
+            devopsPosition.setSalaryMin(new BigDecimal("4200"));
+            devopsPosition.setSalaryMax(new BigDecimal("6200"));
+            devopsPosition.setContractType(ContractType.CDI);
+            devopsPosition.setExperienceRequired(4);
+            devopsPosition.setEducationRequired(EducationLevel.BACHELORS);
+            devopsPosition.setStatus(PositionStatus.ACTIVE);
+            devopsPosition.setMobilityType(MobilityType.INTERNAL);
+            devopsPosition.setTargetBranch(moroccoBranch);
+
+            positionRepository.save(devopsPosition);
+        }
+
+        // Position 7: Spring Boot Consultant - Très compatible
+        if (!positionRepository.existsByTitle("Spring Boot Consultant")) {
+            Position consultantPosition = new Position();
+            consultantPosition.setTitle("Spring Boot Consultant");
+            consultantPosition.setDepartment("Consulting");
+            consultantPosition.setDescription("Spring Boot Consultant to work with clients on modernizing their " +
+                    "Java applications. Design and implement REST APIs and microservices solutions.");
+            consultantPosition.setRequirements("Expert level Spring Boot, RESTful APIs, PostgreSQL, " +
+                    "microservices, Docker. Client-facing experience and strong communication skills.");
+            consultantPosition.setSalaryMin(new BigDecimal("4500"));
+            consultantPosition.setSalaryMax(new BigDecimal("6500"));
+            consultantPosition.setContractType(ContractType.FREELANCE);
+            consultantPosition.setExperienceRequired(5);
+            consultantPosition.setEducationRequired(EducationLevel.MASTERS);
+            consultantPosition.setStatus(PositionStatus.ACTIVE);
+            consultantPosition.setMobilityType(MobilityType.EXTERNAL);
+            consultantPosition.setTargetBranch(franceBranch);
+
+            positionRepository.save(consultantPosition);
+        }
+
+        // Position 8: Technical Lead Java - Très compatible
+        if (!positionRepository.existsByTitle("Technical Lead Java")) {
+            Position techLeadPosition = new Position();
+            techLeadPosition.setTitle("Technical Lead Java");
+            techLeadPosition.setDepartment("Software Development");
+            techLeadPosition.setDescription("Technical Lead to guide a team of Java developers. " +
+                    "Responsible for code quality, architecture decisions, and team mentoring.");
+            techLeadPosition.setRequirements("5+ years Java, Spring Boot, team leadership experience, " +
+                    "Agile methodologies, code review, PostgreSQL, Docker knowledge.");
+            techLeadPosition.setSalaryMin(new BigDecimal("5000"));
+            techLeadPosition.setSalaryMax(new BigDecimal("7000"));
+            techLeadPosition.setContractType(ContractType.CDI);
+            techLeadPosition.setExperienceRequired(5);
+            techLeadPosition.setEducationRequired(EducationLevel.MASTERS);
+            techLeadPosition.setStatus(PositionStatus.ACTIVE);
+            techLeadPosition.setMobilityType(MobilityType.INTERNAL);
+            techLeadPosition.setTargetBranch(tunisiaBranch);
+
+            positionRepository.save(techLeadPosition);
+        }
+
+        // Position 9: Software Engineer - Compatible mais junior
+        if (!positionRepository.existsByTitle("Software Engineer Java")) {
+            Position softwareEngPosition = new Position();
+            softwareEngPosition.setTitle("Software Engineer Java");
+            softwareEngPosition.setDepartment("Software Development");
+            softwareEngPosition.setDescription("Software Engineer to develop and maintain Java applications. " +
+                    "Work in an Agile team to deliver high-quality software solutions.");
+            softwareEngPosition.setRequirements("3+ years Java, Spring framework, SQL databases, " +
+                    "Git, unit testing, basic Docker knowledge preferred.");
+            softwareEngPosition.setSalaryMin(new BigDecimal("2800"));
+            softwareEngPosition.setSalaryMax(new BigDecimal("4200"));
+            softwareEngPosition.setContractType(ContractType.CDI);
+            softwareEngPosition.setExperienceRequired(3);
+            softwareEngPosition.setEducationRequired(EducationLevel.BACHELORS);
+            softwareEngPosition.setStatus(PositionStatus.ACTIVE);
+            softwareEngPosition.setMobilityType(MobilityType.INTERNAL);
+            softwareEngPosition.setTargetBranch(tunisiaBranch);
+
+            positionRepository.save(softwareEngPosition);
+        }
+
+        // Position 10: Cloud Solutions Engineer - Compatible
+        if (!positionRepository.existsByTitle("Cloud Solutions Engineer")) {
+            Position cloudPosition = new Position();
+            cloudPosition.setTitle("Cloud Solutions Engineer");
+            cloudPosition.setDepartment("Cloud Services");
+            cloudPosition.setDescription("Design and implement cloud-based solutions using AWS services. " +
+                    "Migrate existing Java applications to cloud infrastructure.");
+            cloudPosition.setRequirements("AWS services, Java applications deployment, Docker, " +
+                    "Kubernetes, PostgreSQL on cloud, CI/CD pipelines.");
+            cloudPosition.setSalaryMin(new BigDecimal("4800"));
+            cloudPosition.setSalaryMax(new BigDecimal("6800"));
+            cloudPosition.setContractType(ContractType.CDI);
+            cloudPosition.setExperienceRequired(4);
+            cloudPosition.setEducationRequired(EducationLevel.MASTERS);
+            cloudPosition.setStatus(PositionStatus.ACTIVE);
+            cloudPosition.setMobilityType(MobilityType.EXTERNAL);
+            cloudPosition.setTargetBranch(moroccoBranch);
+
+            positionRepository.save(cloudPosition);
+        }
     }
 
     private void createDefaultBranches() {

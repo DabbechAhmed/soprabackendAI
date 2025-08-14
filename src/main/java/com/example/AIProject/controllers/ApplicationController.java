@@ -1,5 +1,6 @@
 package com.example.AIProject.controllers;
 
+import com.example.AIProject.dto.ApplicationDto;
 import com.example.AIProject.entities.Application;
 import com.example.AIProject.enums.ApplicationStatus;
 import com.example.AIProject.exceptions.ResourceNotFoundException;
@@ -27,7 +28,7 @@ public class ApplicationController {
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllApplications() {
-        List<Application> applications = applicationService.getAllApplications();
+        List<ApplicationDto> applications = applicationService.getAllApplications();
         return ResponseEntity.ok(new ApiResponse("Candidatures récupérées avec succès", applications));
     }
 
@@ -41,26 +42,26 @@ public class ApplicationController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse> getApplicationsByUserId(@PathVariable Long userId) {
-        List<Application> applications = applicationService.getApplicationsByUserId(userId);
+        List<ApplicationDto> applications = applicationService.getApplicationsByUserId(userId);
         return ResponseEntity.ok(new ApiResponse("Candidatures récupérées avec succès pour l'utilisateur", applications));
     }
 
     @GetMapping("/position/{positionId}")
     public ResponseEntity<ApiResponse> getApplicationsByPositionId(@PathVariable Long positionId) {
-        List<Application> applications = applicationService.getApplicationsByPositionId(positionId);
+        List<ApplicationDto> applications = applicationService.getApplicationsByPositionId(positionId);
         return ResponseEntity.ok(new ApiResponse("Candidatures récupérées avec succès pour la position", applications));
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<ApiResponse> getApplicationsByStatus(@PathVariable ApplicationStatus status) {
-        List<Application> applications = applicationService.getApplicationsByStatus(status);
+        List<ApplicationDto> applications = applicationService.getApplicationsByStatus(status);
         return ResponseEntity.ok(new ApiResponse("Candidatures récupérées avec succès par statut", applications));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse> createApplication(@Valid @RequestBody CreateApplicationRequest request) {
         try {
-            Application createdApplication = applicationService.createApplication(request);
+            ApplicationDto createdApplication = applicationService.createApplication(request);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ApiResponse("Candidature créée avec succès", createdApplication));
         } catch (UnAuthorizedException e) {
@@ -77,7 +78,7 @@ public class ApplicationController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateApplicationRequest request) {
         try {
-            Application updatedApplication = applicationService.updateApplication(id, request);
+            ApplicationDto updatedApplication = applicationService.updateApplication(id, request);
             return ResponseEntity.ok(new ApiResponse("Candidature mise à jour avec succès", updatedApplication));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -90,7 +91,7 @@ public class ApplicationController {
             @PathVariable Long id,
             @RequestParam ApplicationStatus status) {
         try {
-            Application application = applicationService.updateApplicationStatus(id, status);
+            ApplicationDto application = applicationService.updateApplicationStatus(id, status);
             return ResponseEntity.ok(new ApiResponse("Statut de la candidature mis à jour avec succès", application));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -103,7 +104,7 @@ public class ApplicationController {
             @PathVariable Long id,
             @RequestParam BigDecimal score) {
         try {
-            Application application = applicationService.updateAiMatchScore(id, score);
+            ApplicationDto application = applicationService.updateAiMatchScore(id, score);
             return ResponseEntity.ok(new ApiResponse("Score IA mis à jour avec succès", application));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

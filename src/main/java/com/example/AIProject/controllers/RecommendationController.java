@@ -29,6 +29,57 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendations);
     }
 
+    @GetMapping("/positions/{employeeId}/country/{country}")
+    public ResponseEntity<List<PositionRecommendationDto>> getRecommendedPositionsByCountry(
+            @PathVariable Long employeeId,
+            @PathVariable String country) {
+
+        log.info("Demande de recommandations pour l'employé {} dans le pays {}",
+                employeeId, country);
+
+        List<PositionRecommendationDto> recommendations =
+                recommendationService.getRecommendedPositionsByCountry(employeeId, country);
+
+        return ResponseEntity.ok(recommendations);
+    }
+
+    @GetMapping("/positions/{employeeId}/country/{country}/city/{city}")
+    public ResponseEntity<List<PositionRecommendationDto>> getRecommendedPositionsByCountryAndCity(
+            @PathVariable Long employeeId,
+            @PathVariable String country,
+            @PathVariable String city) {
+
+        log.info("Demande de recommandations pour l'employé {} dans {} - {}",
+                employeeId, country, city);
+
+        List<PositionRecommendationDto> recommendations =
+                recommendationService.getRecommendedPositionsByCountryAndCity(employeeId, country, city);
+
+        return ResponseEntity.ok(recommendations);
+    }
+
+    @GetMapping("/positions/{employeeId}/location")
+    public ResponseEntity<List<PositionRecommendationDto>> getRecommendedPositionsByLocation(
+            @PathVariable Long employeeId,
+            @RequestParam String country,
+            @RequestParam(required = false) String city) {
+
+        log.info("Demande de recommandations pour l'employé {} - Pays: {}, Ville: {}",
+                employeeId, country, city);
+
+        List<PositionRecommendationDto> recommendations;
+
+        if (city != null && !city.trim().isEmpty()) {
+            recommendations = recommendationService.getRecommendedPositionsByCountryAndCity(
+                    employeeId, country, city);
+        } else {
+            recommendations = recommendationService.getRecommendedPositionsByCountry(
+                    employeeId, country);
+        }
+
+        return ResponseEntity.ok(recommendations);
+    }
+
     @GetMapping("/positions/{employeeId}/branch/{branchId}")
     public ResponseEntity<List<PositionRecommendationDto>> getRecommendedPositionsByBranch(
             @PathVariable Long employeeId,

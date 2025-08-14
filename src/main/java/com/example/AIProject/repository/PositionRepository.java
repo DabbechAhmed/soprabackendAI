@@ -35,6 +35,12 @@ public interface PositionRepository extends JpaRepository<Position, Long> {
     @Query("SELECT p FROM Position p WHERE p.status = 'ACTIVE' AND p.mobilityType = 'EXTERNAL' AND p.targetBranch.country != 'Tunisia'")
     List<Position> findExternalMobilityPositions();
 
+    @Query("SELECT p FROM Position p WHERE p.status = 'ACTIVE' AND p.targetBranch.country = :country")
+    List<Position> findActivePositionsByCountry(@Param("country") String country);
+
+    @Query("SELECT p FROM Position p WHERE p.status = 'ACTIVE' AND p.targetBranch.country = :country AND p.targetBranch.city = :city")
+    List<Position> findActivePositionsByCountryAndCity(@Param("country") String country, @Param("city") String city);
+
     List<Position> findByTargetBranchIdAndStatus(Long branchId, PositionStatus status);
     boolean existsByTitle(String title);
 }

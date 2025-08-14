@@ -1,5 +1,6 @@
 package com.example.AIProject.services.application;
 
+import com.example.AIProject.dto.ApplicationDto;
 import com.example.AIProject.entities.Application;
 import com.example.AIProject.enums.ApplicationStatus;
 import com.example.AIProject.requests.application.CreateApplicationRequest;
@@ -10,15 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IApplicationService {
-    List<Application> getAllApplications();
-    Optional<Application> getApplicationById(Long id);
-    Application createApplication(CreateApplicationRequest request);
-    Application updateApplication(Long id, UpdateApplicationRequest request);
+    List<ApplicationDto> getAllApplications();
+    Optional<ApplicationDto> getApplicationById(Long id);
+    ApplicationDto createApplication(CreateApplicationRequest request);
+    ApplicationDto updateApplication(Long id, UpdateApplicationRequest request);
     void deleteApplication(Long id);
-    List<Application> getApplicationsByUserId(Long userId);
-    List<Application> getApplicationsByPositionId(Long positionId);
-    List<Application> getApplicationsByStatus(ApplicationStatus status);
-    Application updateApplicationStatus(Long id, ApplicationStatus status);
-    Application updateAiMatchScore(Long id, BigDecimal score);
+    List<ApplicationDto> getApplicationsByUserId(Long userId);
+    List<ApplicationDto> getApplicationsByPositionId(Long positionId);
+    List<ApplicationDto> getApplicationsByStatus(ApplicationStatus status);
+    ApplicationDto updateApplicationStatus(Long id, ApplicationStatus status);
+    ApplicationDto updateAiMatchScore(Long id, BigDecimal score);
     boolean hasUserAppliedToPosition(Long userId, Long positionId);
 }
