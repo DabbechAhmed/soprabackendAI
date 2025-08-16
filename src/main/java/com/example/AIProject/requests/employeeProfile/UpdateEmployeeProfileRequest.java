@@ -22,6 +22,9 @@ public class UpdateEmployeeProfileRequest {
     @Size(max = 2000, message = "Skills must not exceed 2000 characters")
     private String skills;
 
+    @Size(max = 2000, message = "Soft skills must not exceed 2000 characters")
+    private String softSkills;
+
     @Size(max = 100, message = "Country must not exceed 100 characters")
     private String country;
 

@@ -38,6 +38,9 @@ public class EmployeeProfile {
     @Column(columnDefinition = "TEXT")
     private String skills;
 
+    @Column(columnDefinition = "TEXT")
+    private String softSkills;
+
     @Column(nullable = false)
     private String country;
 

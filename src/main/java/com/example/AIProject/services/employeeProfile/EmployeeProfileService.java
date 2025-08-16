@@ -98,6 +98,9 @@ public class EmployeeProfileService implements IEmployeeProfileService {
                     if (request.getPreferredSalaryMax() != null) {
                         existingProfile.setPreferredSalaryMax(request.getPreferredSalaryMax());
                     }
+                    if (request.getSoftSkills() != null) {
+                        existingProfile.setSoftSkills(request.getSoftSkills());
+                    }
 
                     // Vérifier si le profil devient complet après mise à jour
                     checkAndSetProfileComplete(existingProfile);

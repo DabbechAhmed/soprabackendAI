@@ -3,6 +3,7 @@ package com.example.AIProject.requests.employeeProfile;
 import com.example.AIProject.enums.EducationLevel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,8 @@ public class CreateEmployeeProfileRequest {
 
     @NotBlank
     private String city;
+    @Size(max = 2000, message = "Soft skills must not exceed 2000 characters")
+    private String softSkills;
 
     private BigDecimal preferredSalaryMin;
 

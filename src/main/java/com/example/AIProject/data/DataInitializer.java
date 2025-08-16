@@ -49,7 +49,7 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
                     .orElseThrow(() -> new ResourceNotFoundException("Employee role not found"));
 
             Branch tunisiaBranch = branchRepository.findByBranchCode("SOPRA_TUNISIA")
-                    .orElseThrow(() -> new RuntimeException("Tunisia branch not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Tunisia branch not found"));
 
             // Créer l'utilisateur
             User testUser = new User();

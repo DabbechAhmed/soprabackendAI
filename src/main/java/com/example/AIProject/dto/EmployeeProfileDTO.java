@@ -20,6 +20,7 @@ public class EmployeeProfileDTO {
     private Integer experienceYears;
     private EducationLevel education;
     private String skills;
+    private String softSkills;
     private String country;
     private String city;
     private BigDecimal preferredSalaryMin;
