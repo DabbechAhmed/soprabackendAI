@@ -36,8 +36,56 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
         createDefaultBranches();
         createDefaultEmployees();
         createTestEmployee(); // NOUVEAU
-        createSecondTestEmployee(); // NOUVEAU
+        createSecondTestEmployee();
+        createBusinessAnalystEmployee();// NOUVEAU
+        createProjectManagerEmployee(); // NOUVEAU
         createTestPositions(); // NOUVEAU
+    }
+    private void createProjectManagerEmployee() {
+        String testEmail = "thomas.bernard@sopra-tunisia.com";
+
+        if (userRepository.findByEmail(testEmail) == null) {
+            Role employeeRole = roleRepository.findByName("ROLE_EMPLOYEE")
+                    .orElseThrow(() -> new ResourceNotFoundException("Employee role not found"));
+
+            Branch tunisiaBranch = branchRepository.findByBranchCode("SOPRA_TUNISIA")
+                    .orElseThrow(() -> new RuntimeException("Tunisia branch not found"));
+
+            // Créer l'utilisateur
+            User testUser = new User();
+            testUser.setEmail(testEmail);
+            testUser.setPassword(passwordEncoder.encode("password123"));
+            testUser.setFullName("Thomas Bernard");
+            testUser.setRoles(new HashSet<>(Set.of(employeeRole)));
+            testUser.setCurrentBranch(tunisiaBranch);
+
+            User savedUser = userRepository.save(testUser);
+
+            // Créer le profil employé Chef de Projet IT
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setUser(savedUser);
+            profile.setCvText("Chef de Projet IT avec 6 années d'expérience dans la gestion de projets de développement " +
+                    "logiciel et transformation digitale. Expertise en méthodologies Agile/Scrum et gestion d'équipes " +
+                    "multidisciplinaires. Certification PMP et Scrum Master. Expérience réussie dans la livraison de " +
+                    "projets complexes allant de 500K€ à 2M€. Solide background technique avec une compréhension approfondie " +
+                    "des architectures Java/Spring Boot et des bases de données. Excellent leadership et capacités de " +
+                    "communication pour coordonner les parties prenantes techniques et métier. Expérience dans les secteurs " +
+                    "bancaire, e-commerce et télécommunications.");
+
+            profile.setExperienceYears(6);
+            profile.setEducation(EducationLevel.MASTERS);
+            profile.setSkills("Project Management, PMP Certified, Scrum Master, Agile Methodologies, JIRA, " +
+                    "MS Project, Confluence, Risk Management, Budget Management, Team Leadership, " +
+                    "Java/Spring Boot Knowledge, SQL, Git, CI/CD, Stakeholder Management, " +
+                    "Change Management, Quality Assurance, Gantt Charts, Kanban");
+            profile.setCountry("Tunisia");
+            profile.setCity("Tunis");
+            profile.setPreferredSalaryMin(new BigDecimal("4200"));
+            profile.setPreferredSalaryMax(new BigDecimal("6000"));
+            profile.setProfileComplete(true);
+
+            employeeProfileRepository.save(profile);
+        }
     }
     private void createSecondTestEmployee() {
         String testEmail = "sarah.martin@sopra-tunisia.com";
@@ -486,6 +534,50 @@ private void createDefaultBranches() {
 
                 userRepository.save(user);
             }
+        }
+    }
+    private void createBusinessAnalystEmployee() {
+        String testEmail = "lisa.anderson@sopra-tunisia.com";
+
+        if (userRepository.findByEmail(testEmail) == null) {
+            Role employeeRole = roleRepository.findByName("ROLE_EMPLOYEE")
+                    .orElseThrow(() -> new ResourceNotFoundException("Employee role not found"));
+
+            Branch tunisiaBranch = branchRepository.findByBranchCode("SOPRA_TUNISIA")
+                    .orElseThrow(() -> new RuntimeException("Tunisia branch not found"));
+
+            // Créer l'utilisateur
+            User testUser = new User();
+            testUser.setEmail(testEmail);
+            testUser.setPassword(passwordEncoder.encode("password123"));
+            testUser.setFullName("Lisa Anderson");
+            testUser.setRoles(new HashSet<>(Set.of(employeeRole)));
+            testUser.setCurrentBranch(tunisiaBranch);
+
+            User savedUser = userRepository.save(testUser);
+
+            // Créer le profil employé Business Analyst
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setUser(savedUser);
+            profile.setCvText("Business Analyst avec 4 années d'expérience dans l'analyse des besoins métier " +
+                    "et la modélisation des processus. Expertise en collecte d'exigences, documentation fonctionnelle, " +
+                    "et amélioration des processus. Expérience avec les méthodologies Agile et Waterfall. " +
+                    "Compétences avancées en Excel, SQL, et outils de modélisation UML/BPMN. " +
+                    "Forte capacité d'analyse et excellentes compétences de communication pour servir de liaison " +
+                    "entre les équipes techniques et business. Expérience dans le secteur bancaire et e-commerce.");
+
+            profile.setExperienceYears(4);
+            profile.setEducation(EducationLevel.BACHELORS);
+            profile.setSkills("Business Analysis, Requirements Gathering, Process Modeling, UML, BPMN, " +
+                    "Excel Advanced, SQL, JIRA, Confluence, Agile Methodologies, Stakeholder Management, " +
+                    "Documentation, Data Analysis, Visio, Power BI, Tableau");
+            profile.setCountry("Tunisia");
+            profile.setCity("Tunis");
+            profile.setPreferredSalaryMin(new BigDecimal("3000"));
+            profile.setPreferredSalaryMax(new BigDecimal("4500"));
+            profile.setProfileComplete(true);
+
+            employeeProfileRepository.save(profile);
         }
     }
 
