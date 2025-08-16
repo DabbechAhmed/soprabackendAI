@@ -26,4 +26,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     @Query("SELECT COUNT(a) FROM Application a WHERE a.position.id = :positionId")
     long countApplicationsByPositionId(@Param("positionId") Long positionId);
+
+    List<Application> findByPositionIdAndStatusAndIdNot(Long positionId, ApplicationStatus applicationStatus, Long acceptedApplicationId);
 }

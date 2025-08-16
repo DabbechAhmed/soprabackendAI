@@ -19,7 +19,10 @@ public interface IApplicationService {
     List<ApplicationDto> getApplicationsByUserId(Long userId);
     List<ApplicationDto> getApplicationsByPositionId(Long positionId);
     List<ApplicationDto> getApplicationsByStatus(ApplicationStatus status);
-    ApplicationDto updateApplicationStatus(Long id, ApplicationStatus status);
+    ApplicationDto acceptApplication(Long id);
+
+    ApplicationDto rejectApplication(Long id);
+
     ApplicationDto updateAiMatchScore(Long id, BigDecimal score);
     boolean hasUserAppliedToPosition(Long userId, Long positionId);
 }

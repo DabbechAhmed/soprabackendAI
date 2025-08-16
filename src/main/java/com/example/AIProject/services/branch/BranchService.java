@@ -1,9 +1,11 @@
 package com.example.AIProject.services.branch;
 
+import com.example.AIProject.dto.BranchDto;
 import com.example.AIProject.entities.Branch;
 import com.example.AIProject.exceptions.ResourceNotFoundException;
 import com.example.AIProject.repository.BranchRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +18,15 @@ import java.util.Optional;
 public class BranchService implements IBranchService {
 
     private final BranchRepository branchRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Branch> getAllBranches() {
-        return branchRepository.findAll();
+    public List<BranchDto> getAllBranches() {
+        return branchRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
     @Override
@@ -79,5 +85,10 @@ public class BranchService implements IBranchService {
     @Transactional(readOnly = true)
     public List<Branch> getBranchesByCountry(String country) {
         return branchRepository.findByCountry(country);
+    }
+
+    @Override
+    public BranchDto convertToDto(Branch branch) {
+        return modelMapper.map(branch, BranchDto.class);
     }
 }

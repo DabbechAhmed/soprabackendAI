@@ -36,7 +36,52 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
         createDefaultBranches();
         createDefaultEmployees();
         createTestEmployee(); // NOUVEAU
+        createSecondTestEmployee(); // NOUVEAU
         createTestPositions(); // NOUVEAU
+    }
+    private void createSecondTestEmployee() {
+        String testEmail = "sarah.martin@sopra-tunisia.com";
+
+        if (userRepository.findByEmail(testEmail) == null) {
+            Role employeeRole = roleRepository.findByName("ROLE_EMPLOYEE")
+                    .orElseThrow(() -> new ResourceNotFoundException("Employee role not found"));
+
+            Branch franceBranch = branchRepository.findByBranchCode("SOPRA_TUNISIA")
+                    .orElseThrow(() -> new ResourceNotFoundException("France branch not found"));
+
+            // Créer l'utilisateur
+            User testUser = new User();
+            testUser.setEmail(testEmail);
+            testUser.setPassword(passwordEncoder.encode("password123"));
+            testUser.setFullName("Sarah Martin");
+            testUser.setRoles(new HashSet<>(Set.of(employeeRole)));
+            testUser.setCurrentBranch(franceBranch);
+
+            User savedUser = userRepository.save(testUser);
+
+            // Créer le profil employé complet
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setUser(savedUser);
+            profile.setCvText("Full Stack Developer with 4 years of experience in React.js, Node.js, " +
+                    "and modern JavaScript frameworks. Strong background in UI/UX design and " +
+                    "responsive web development. Experience with TypeScript, Redux, and GraphQL. " +
+                    "Familiar with Java Spring Boot for backend development and MongoDB databases. " +
+                    "Passionate about creating intuitive user interfaces and optimizing application performance. " +
+                    "Experience with Agile development and collaborative team environments.");
+
+            profile.setExperienceYears(4);
+            profile.setEducation(EducationLevel.BACHELORS);
+            profile.setSkills("React.js, JavaScript, TypeScript, Node.js, HTML5, CSS3, SASS, " +
+                    "Redux, GraphQL, MongoDB, Git, Webpack, Jest, Cypress, Figma, Adobe XD, " +
+                    "Bootstrap, Material-UI, Express.js, RESTful APIs");
+            profile.setCountry("France");
+            profile.setCity("Paris");
+            profile.setPreferredSalaryMin(new BigDecimal("3500"));
+            profile.setPreferredSalaryMax(new BigDecimal("4800"));
+            profile.setProfileComplete(true);
+
+            employeeProfileRepository.save(profile);
+        }
     }
     private void createTestEmployee() {
         String testEmail = "john.doe@sopra-tunisia.com";
@@ -301,50 +346,100 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
         }
     }
 
-    private void createDefaultBranches() {
-        // Créer la branche de Tunisie
-        if (branchRepository.findByBranchCode("SOPRA_TUNISIA").isEmpty()) {
-            Branch tunisiaBranch = new Branch();
-            tunisiaBranch.setBranchCode("SOPRA_TUNISIA");
-            tunisiaBranch.setBranchName("Sopra Tunisia");
-            tunisiaBranch.setCountry("Tunisia");
-            tunisiaBranch.setCity("Tunis");
-            tunisiaBranch.setAddress("Avenue Habib Bourguiba, Tunis");
-            tunisiaBranch.setContactEmail("contact@sopra-tunisia.com");
-            tunisiaBranch.setContactPhone("+216 71 123 456");
-            tunisiaBranch.setActive(true);
-            branchRepository.save(tunisiaBranch);
-        }
-
-        // Créer la branche de France
-        if (branchRepository.findByBranchCode("SOPRA_FRANCE").isEmpty()) {
-            Branch franceBranch = new Branch();
-            franceBranch.setBranchCode("SOPRA_FRANCE");
-            franceBranch.setBranchName("Sopra France");
-            franceBranch.setCountry("France");
-            franceBranch.setCity("Paris");
-            franceBranch.setAddress("9 bis rue de Presbourg, 75116 Paris");
-            franceBranch.setContactEmail("contact@sopra-france.com");
-            franceBranch.setContactPhone("+33 1 40 67 29 29");
-            franceBranch.setActive(true);
-            branchRepository.save(franceBranch);
-        }
-
-        // Créer la branche du Maroc
-        if (branchRepository.findByBranchCode("SOPRA_MOROCCO").isEmpty()) {
-            Branch moroccoBranch = new Branch();
-            moroccoBranch.setBranchCode("SOPRA_MOROCCO");
-            moroccoBranch.setBranchName("Sopra Morocco");
-            moroccoBranch.setCountry("Morocco");
-            moroccoBranch.setCity("Casablanca");
-            moroccoBranch.setAddress("Boulevard Moulay Slimane, Casablanca");
-            moroccoBranch.setContactEmail("contact@sopra-morocco.com");
-            moroccoBranch.setContactPhone("+212 522 123 456");
-            moroccoBranch.setActive(true);
-            branchRepository.save(moroccoBranch);
-        }
+private void createDefaultBranches() {
+    // Branches existantes
+    if (branchRepository.findByBranchCode("SOPRA_TUNISIA").isEmpty()) {
+        Branch tunisiaBranch = new Branch();
+        tunisiaBranch.setBranchCode("SOPRA_TUNISIA");
+        tunisiaBranch.setBranchName("Sopra Tunisia");
+        tunisiaBranch.setCountry("Tunisia");
+        tunisiaBranch.setCity("Tunis");
+        tunisiaBranch.setAddress("Avenue Habib Bourguiba, Tunis");
+        tunisiaBranch.setContactEmail("contact@sopra-tunisia.com");
+        tunisiaBranch.setContactPhone("+216 71 123 456");
+        tunisiaBranch.setActive(true);
+        branchRepository.save(tunisiaBranch);
     }
 
+    if (branchRepository.findByBranchCode("SOPRA_FRANCE").isEmpty()) {
+        Branch franceBranch = new Branch();
+        franceBranch.setBranchCode("SOPRA_FRANCE");
+        franceBranch.setBranchName("Sopra France");
+        franceBranch.setCountry("France");
+        franceBranch.setCity("Paris");
+        franceBranch.setAddress("9 bis rue de Presbourg, 75116 Paris");
+        franceBranch.setContactEmail("contact@sopra-france.com");
+        franceBranch.setContactPhone("+33 1 40 67 29 29");
+        franceBranch.setActive(true);
+        branchRepository.save(franceBranch);
+    }
+
+    if (branchRepository.findByBranchCode("SOPRA_MOROCCO").isEmpty()) {
+        Branch moroccoBranch = new Branch();
+        moroccoBranch.setBranchCode("SOPRA_MOROCCO");
+        moroccoBranch.setBranchName("Sopra Morocco");
+        moroccoBranch.setCountry("Morocco");
+        moroccoBranch.setCity("Casablanca");
+        moroccoBranch.setAddress("Boulevard Moulay Slimane, Casablanca");
+        moroccoBranch.setContactEmail("contact@sopra-morocco.com");
+        moroccoBranch.setContactPhone("+212 522 123 456");
+        moroccoBranch.setActive(true);
+        branchRepository.save(moroccoBranch);
+    }
+
+    // Nouvelles branches
+    if (branchRepository.findByBranchCode("SOPRA_ITALY").isEmpty()) {
+        Branch italyBranch = new Branch();
+        italyBranch.setBranchCode("SOPRA_ITALY");
+        italyBranch.setBranchName("Sopra Italy");
+        italyBranch.setCountry("Italy");
+        italyBranch.setCity("Milan");
+        italyBranch.setAddress("Via del Corso, 20121 Milano");
+        italyBranch.setContactEmail("contact@sopra-italy.com");
+        italyBranch.setContactPhone("+39 02 123 456");
+        italyBranch.setActive(true);
+        branchRepository.save(italyBranch);
+    }
+
+    if (branchRepository.findByBranchCode("SOPRA_SPAIN").isEmpty()) {
+        Branch spainBranch = new Branch();
+        spainBranch.setBranchCode("SOPRA_SPAIN");
+        spainBranch.setBranchName("Sopra Spain");
+        spainBranch.setCountry("Spain");
+        spainBranch.setCity("Madrid");
+        spainBranch.setAddress("Calle de Alcalá, 28014 Madrid");
+        spainBranch.setContactEmail("contact@sopra-spain.com");
+        spainBranch.setContactPhone("+34 91 123 456");
+        spainBranch.setActive(true);
+        branchRepository.save(spainBranch);
+    }
+
+    if (branchRepository.findByBranchCode("SOPRA_GERMANY").isEmpty()) {
+        Branch germanyBranch = new Branch();
+        germanyBranch.setBranchCode("SOPRA_GERMANY");
+        germanyBranch.setBranchName("Sopra Germany");
+        germanyBranch.setCountry("Germany");
+        germanyBranch.setCity("Berlin");
+        germanyBranch.setAddress("Unter den Linden, 10117 Berlin");
+        germanyBranch.setContactEmail("contact@sopra-germany.com");
+        germanyBranch.setContactPhone("+49 30 123 456");
+        germanyBranch.setActive(true);
+        branchRepository.save(germanyBranch);
+    }
+
+    if (branchRepository.findByBranchCode("SOPRA_UK").isEmpty()) {
+        Branch ukBranch = new Branch();
+        ukBranch.setBranchCode("SOPRA_UK");
+        ukBranch.setBranchName("Sopra United Kingdom");
+        ukBranch.setCountry("United Kingdom");
+        ukBranch.setCity("London");
+        ukBranch.setAddress("1 London Bridge Street, London SE1 9GF");
+        ukBranch.setContactEmail("contact@sopra-uk.com");
+        ukBranch.setContactPhone("+44 20 123 456");
+        ukBranch.setActive(true);
+        branchRepository.save(ukBranch);
+    }
+}
 
 
 

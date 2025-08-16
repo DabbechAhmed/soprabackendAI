@@ -86,19 +86,41 @@ public class ApplicationController {
         }
     }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<ApiResponse> updateApplicationStatus(
-            @PathVariable Long id,
-            @RequestParam ApplicationStatus status) {
-        try {
-            ApplicationDto application = applicationService.updateApplicationStatus(id, status);
-            return ResponseEntity.ok(new ApiResponse("Statut de la candidature mis à jour avec succès", application));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(e.getMessage(), null));
-        }
-    }
+ @PutMapping("/{id}/status")
+ public ResponseEntity<ApiResponse> updateApplicationStatus(
+         @PathVariable Long id,
+         @RequestParam ApplicationStatus status) {
+     try {
+         ApplicationDto application;
 
+         switch (status) {
+             case ACCEPTED:
+                 // Utiliser la méthode spécialisée pour l'acceptation
+                 application = applicationService.acceptApplication(id);
+                 break;
+             case REJECTED:
+                 // Utiliser la méthode spécialisée pour le refus
+                 application = applicationService.rejectApplication(id);
+                 break;
+             case PENDING:
+                 // Utiliser updateApplication pour remettre en attente
+                 UpdateApplicationRequest request = new UpdateApplicationRequest();
+                 request.setStatus(status);
+                 application = applicationService.updateApplication(id, request);
+                 break;
+             default:
+                 throw new IllegalArgumentException("Statut non supporté: " + status);
+         }
+
+         return ResponseEntity.ok(new ApiResponse("Statut de la candidature mis à jour avec succès", application));
+     } catch (UnAuthorizedException | ResourceNotFoundException | IllegalArgumentException e) {
+         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                 .body(new ApiResponse(e.getMessage(), null));
+     } catch (RuntimeException e) {
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                 .body(new ApiResponse(e.getMessage(), null));
+     }
+ }
     @PutMapping("/{id}/ai-score")
     public ResponseEntity<ApiResponse> updateAiMatchScore(
             @PathVariable Long id,

@@ -1,5 +1,6 @@
 package com.example.AIProject.controllers;
 
+import com.example.AIProject.dto.PositionDto;
 import com.example.AIProject.entities.Position;
 import com.example.AIProject.requests.position.CreatePositionRequest;
 import com.example.AIProject.requests.position.UpdatePositionRequest;
@@ -23,7 +24,7 @@ public class PositionController {
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllPositions() {
-        List<Position> positions = positionService.getAllPositions();
+        List<PositionDto> positions = positionService.getAllPositions();
         return ResponseEntity.ok(new ApiResponse("Positions récupérées avec succès", positions));
     }
 
@@ -37,7 +38,7 @@ public class PositionController {
 
     @GetMapping("/active")
     public ResponseEntity<ApiResponse> getActivePositions() {
-        List<Position> positions = positionService.getActivePositions();
+        List<PositionDto> positions = positionService.getActivePositions();
         return ResponseEntity.ok(new ApiResponse("Positions actives récupérées avec succès", positions));
     }
 
@@ -45,20 +46,20 @@ public class PositionController {
     public ResponseEntity<ApiResponse> getPositionsByLocation(
             @RequestParam String country,
             @RequestParam String city) {
-        List<Position> positions = positionService.getPositionsByLocation(country, city);
+        List<PositionDto> positions = positionService.getPositionsByLocation(country, city);
         return ResponseEntity.ok(new ApiResponse("Positions récupérées avec succès pour la localisation", positions));
     }
 
     @GetMapping("/department/{department}")
     public ResponseEntity<ApiResponse> getPositionsByDepartment(@PathVariable String department) {
-        List<Position> positions = positionService.getPositionsByDepartment(department);
+        List<PositionDto> positions = positionService.getPositionsByDepartment(department);
         return ResponseEntity.ok(new ApiResponse("Positions récupérées avec succès pour le département", positions));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse> createPosition(@Valid @RequestBody CreatePositionRequest request) {
         try {
-            Position createdPosition = positionService.createPosition(request);
+            PositionDto createdPosition = positionService.createPosition(request);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ApiResponse("Position créée avec succès", createdPosition));
         } catch (IllegalArgumentException e) {
@@ -72,7 +73,7 @@ public class PositionController {
             @PathVariable Long id,
             @Valid @RequestBody UpdatePositionRequest request) {
         try {
-            Position updatedPosition = positionService.updatePosition(id, request);
+            PositionDto updatedPosition = positionService.updatePosition(id, request);
             return ResponseEntity.ok(new ApiResponse("Position mise à jour avec succès", updatedPosition));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -96,7 +97,7 @@ public class PositionController {
             @PathVariable Long id,
             @RequestParam boolean isActive) {
         try {
-            Position position = positionService.changePositionStatus(id, isActive);
+            PositionDto position = positionService.changePositionStatus(id, isActive);
             String statusMessage = isActive ? "activée" : "désactivée";
             return ResponseEntity.ok(new ApiResponse("Position " + statusMessage + " avec succès", position));
         } catch (RuntimeException e) {

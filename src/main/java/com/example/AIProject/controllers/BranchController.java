@@ -1,5 +1,6 @@
 package com.example.AIProject.controllers;
 
+import com.example.AIProject.dto.BranchDto;
 import com.example.AIProject.entities.Branch;
 import com.example.AIProject.responses.ApiResponse;
 import com.example.AIProject.services.branch.IBranchService;
@@ -21,7 +22,7 @@ public class BranchController {
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllBranches() {
-        List<Branch> branches = branchService.getAllBranches();
+        List<BranchDto> branches = branchService.getAllBranches();
         return ResponseEntity.ok(new ApiResponse("Branches retrieved successfully", branches));
     }
 
