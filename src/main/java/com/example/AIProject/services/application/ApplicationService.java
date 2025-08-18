@@ -13,6 +13,7 @@ import com.example.AIProject.repository.PositionRepository;
 import com.example.AIProject.repository.UserRepository;
 import com.example.AIProject.requests.application.CreateApplicationRequest;
 import com.example.AIProject.requests.application.UpdateApplicationRequest;
+import com.example.AIProject.services.notification.INotificationService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class ApplicationService implements IApplicationService {
     private final UserRepository userRepository;
     private final PositionRepository positionRepository;
     private final ModelMapper modelMapper;
+    private final INotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,28 +51,32 @@ public class ApplicationService implements IApplicationService {
                 .map(this::convertToDto);
     }
 
-   @Override
-   public ApplicationDto createApplication(CreateApplicationRequest request) {
-       if (hasUserAppliedToPosition(request.getUserId(), request.getPositionId())) {
-           throw new UnAuthorizedException("L'utilisateur a déjà postulé pour cette position");
-       }
+    @Override
+    public ApplicationDto createApplication(CreateApplicationRequest request) {
+        if (hasUserAppliedToPosition(request.getUserId(), request.getPositionId())) {
+            throw new UnAuthorizedException("L'utilisateur a déjà postulé pour cette position");
+        }
 
-       User user = userRepository.findById(request.getUserId())
-               .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable avec l'ID: " + request.getUserId()));
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable avec l'ID: " + request.getUserId()));
 
-       Position position = positionRepository.findById(request.getPositionId())
-               .orElseThrow(() -> new ResourceNotFoundException("Position introuvable avec l'ID: " + request.getPositionId()));
+        Position position = positionRepository.findById(request.getPositionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Position introuvable avec l'ID: " + request.getPositionId()));
 
-       Application application = new Application();
-       application.setUser(user);
-       application.setPosition(position);
-       application.setCoverLetter(request.getCoverLetter());
-       application.setStatus(ApplicationStatus.PENDING);
-       application.setAiMatchScore(request.getAiMatchScore()); // Utiliser le score de la requête
+        Application application = new Application();
+        application.setUser(user);
+        application.setPosition(position);
+        application.setCoverLetter(request.getCoverLetter());
+        application.setStatus(ApplicationStatus.PENDING);
+        application.setAiMatchScore(request.getAiMatchScore());// Utiliser le score de la requête
 
-       Application savedApplication = applicationRepository.save(application);
-       return convertToDto(savedApplication);
-   }
+
+        Application savedApplication = applicationRepository.save(application);
+
+        notificationService.notifyApplicationSubmitted(savedApplication);
+
+        return convertToDto(savedApplication);
+    }
 
     @Override
     public ApplicationDto updateApplication(Long id, UpdateApplicationRequest request) {
@@ -127,53 +133,61 @@ public class ApplicationService implements IApplicationService {
                 .collect(Collectors.toList());
     }
 
-  @Override
-  public ApplicationDto acceptApplication(Long id) {
-      return applicationRepository.findById(id)
-              .map(application -> {
-                  // Vérifier que la position est toujours active
-                  if (application.getPosition().getStatus() != PositionStatus.ACTIVE) {
-                      throw new UnAuthorizedException("La position n'est plus active");
-                  }
+    @Override
+    public ApplicationDto acceptApplication(Long id) {
+        return applicationRepository.findById(id)
+                .map(application -> {
+                    // Vérifier que la position est toujours active
+                    if (application.getPosition().getStatus() != PositionStatus.ACTIVE) {
+                        throw new UnAuthorizedException("La position n'est plus active");
+                    }
 
-                  application.setStatus(ApplicationStatus.ACCEPTED);
+                    application.setStatus(ApplicationStatus.ACCEPTED);
 
-                  // Optionnel : Fermer automatiquement la position
-                  Position position = application.getPosition();
-                  position.setStatus(PositionStatus.FILLED);
-                  positionRepository.save(position);
+                    // Optionnel : Fermer automatiquement la position
+                    Position position = application.getPosition();
+                    position.setStatus(PositionStatus.FILLED);
+                    positionRepository.save(position);
 
-                  // Optionnel : Rejeter automatiquement les autres candidatures
-                  rejectOtherApplicationsForPosition(application.getPosition().getId(), id);
+                    // Optionnel : Rejeter automatiquement les autres candidatures
+                    rejectOtherApplicationsForPosition(application.getPosition().getId(), id);
 
-                  Application savedApplication = applicationRepository.save(application);
-                  return convertToDto(savedApplication);
-              })
-              .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
-  }
-  @Override
-  public ApplicationDto rejectApplication(Long id) {
-      return applicationRepository.findById(id)
-              .map(application -> {
-                  // Vérifier que la candidature est encore en attente
-                  if (application.getStatus() != ApplicationStatus.PENDING) {
-                      throw new UnAuthorizedException("Cette candidature a déjà été traitée");
-                  }
+                    Application savedApplication = applicationRepository.save(application);
 
-                  application.setStatus(ApplicationStatus.REJECTED);
-                  Application savedApplication = applicationRepository.save(application);
-                  return convertToDto(savedApplication);
-              })
-              .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
-  }
+                    // Notifier l'utilisateur de l'acceptation
+                    notificationService.notifyApplicationAccepted(savedApplication);
+                    return convertToDto(savedApplication);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
+    }
 
-  private void rejectOtherApplicationsForPosition(Long positionId, Long acceptedApplicationId) {
-      List<Application> otherApplications = applicationRepository
-              .findByPositionIdAndStatusAndIdNot(positionId, ApplicationStatus.PENDING, acceptedApplicationId);
+    @Override
+    public ApplicationDto rejectApplication(Long id) {
+        return applicationRepository.findById(id)
+                .map(application -> {
+                    // Vérifier que la candidature est encore en attente
+                    if (application.getStatus() != ApplicationStatus.PENDING) {
+                        throw new UnAuthorizedException("Cette candidature a déjà été traitée");
+                    }
 
-      otherApplications.forEach(app -> app.setStatus(ApplicationStatus.REJECTED));
-      applicationRepository.saveAll(otherApplications);
-  }
+                    application.setStatus(ApplicationStatus.REJECTED);
+                    Application savedApplication = applicationRepository.save(application);
+
+                    // Notifier l'utilisateur du rejet
+                    notificationService.notifyApplicationRejected(savedApplication);
+                    return convertToDto(savedApplication);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
+    }
+
+    private void rejectOtherApplicationsForPosition(Long positionId, Long acceptedApplicationId) {
+        List<Application> otherApplications = applicationRepository
+                .findByPositionIdAndStatusAndIdNot(positionId, ApplicationStatus.PENDING, acceptedApplicationId);
+
+        otherApplications.forEach(app -> app.setStatus(ApplicationStatus.REJECTED));
+        applicationRepository.saveAll(otherApplications);
+    }
+
     @Override
     public ApplicationDto updateAiMatchScore(Long id, BigDecimal score) {
         return applicationRepository.findById(id)
